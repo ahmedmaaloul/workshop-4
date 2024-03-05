@@ -4,6 +4,7 @@ import {
   BASE_USER_PORT,
   REGISTRY_PORT,
 } from "../../src/config";
+const crypto = require('crypto');
 import { launchNetwork } from "../../src/index";
 import { GetNodeRegistryBody } from "../../src/registry/registry";
 import {
@@ -474,7 +475,20 @@ describe("Onion Routing", () => {
       expect(decrypted).toBe(b64Message);
     });
 
-    test.todo("Hidden test - Can rsa encrypt and decrypt - 1pt");
+    //test.todo("Hidden test - Can rsa encrypt and decrypt - 1pt");
+    it("Can RSA encrypt and decrypt  - 1pt", async () => {
+      const { publicKey, privateKey } = await generateRsaKeyPair();
+    
+      const testMessage = "This is a test message.";
+      const b64EncodedMessage = Buffer.from(testMessage).toString('base64');
+    
+      const encryptedMessage = await rsaEncrypt(b64EncodedMessage, await exportPubKey(publicKey));
+      const decryptedMessageB64 = await rsaDecrypt(encryptedMessage, privateKey);
+      const decryptedMessage = Buffer.from(decryptedMessageB64, 'base64').toString();
+    
+      expect(decryptedMessage).toEqual(testMessage);
+    });
+    
 
     it("Can generate symmetric key - 0.5 pt", async () => {
       const symKey = await createRandomSymmetricKey();
@@ -514,7 +528,20 @@ describe("Onion Routing", () => {
       expect(decrypted).toBe(b64Message);
     });
 
-    test.todo("Hidden test - Can symmetrically encrypt and decrypt - 1pt");
+    //test.todo("Hidden test - Can symmetrically encrypt and decrypt - 1pt");
+    it("Can symmetrically encrypt and decrypt - 1pt", async () => {
+      const symKey = await createRandomSymmetricKey();
+    
+      const testMessage = "Symmetric encryption test message.";
+      const b64EncodedMessage = Buffer.from(testMessage).toString('base64');
+    
+      const encryptedMessage = await symEncrypt(symKey, b64EncodedMessage);
+      const decryptedMessageB64 = await symDecrypt(await exportSymKey(symKey), encryptedMessage);
+      const decryptedMessage = Buffer.from(decryptedMessageB64, 'base64').toString();
+    
+      expect(decryptedMessage).toEqual(testMessage);
+    });
+    
   });
 
   describe("Can forward messages through the network - 10 pt", () => {
