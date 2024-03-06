@@ -4,7 +4,6 @@ import {
   BASE_USER_PORT,
   REGISTRY_PORT,
 } from "../../src/config";
-const crypto = require('crypto');
 import { launchNetwork } from "../../src/index";
 import { GetNodeRegistryBody } from "../../src/registry/registry";
 import {
@@ -607,7 +606,6 @@ describe("Onion Routing", () => {
       await sendMessage(BASE_USER_PORT + 0, "Hello world", 1);
 
       const circuit = await getLastCircuit(BASE_USER_PORT + 0);
-
       let lastDecrypted;
 
       for (let index = 0; index < circuit.length - 1; index++) {
@@ -710,7 +708,7 @@ describe("Onion Routing", () => {
       }
     });
 
-    test.todo("Hidden test - the right message is passed to each node - 2pt");
+    //test.todo("Hidden test - the right message is passed to each node - 2pt");
   });
 
   describe("Hidden tests - 2 pt", () => {
@@ -725,8 +723,21 @@ describe("Onion Routing", () => {
       await closeAllServers(servers);
     });
 
-    test.todo("Hidden test - Can send an empty message - 1pt");
+    //test.todo("Hidden test - Can send an empty message - 1pt");
+    it("Can send an empty message - 1pt", async () => {
+      await sendMessage(BASE_USER_PORT + 0, "", 1);
+      const receivedMessage = await getLastReceivedMessage(BASE_USER_PORT + 1);
+      expect(receivedMessage).toBe("");
+    });
+    
 
-    test.todo("Hidden test - Edge case #2 - 1pt");
+    //test.todo("Hidden test - Edge case #2 - 1pt");
+    it("Edge case #2: Handling special characters in messages - 1pt", async () => {
+      const specialMessage = "Hello, world! 🌍 #SpecialTest @$%^&*()";
+      await sendMessage(BASE_USER_PORT + 0, specialMessage, 1);
+      const receivedMessage = await getLastReceivedMessage(BASE_USER_PORT + 1);
+      expect(receivedMessage).toBe(specialMessage);
+    });
+    
   });
 });

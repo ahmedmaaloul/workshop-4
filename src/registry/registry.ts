@@ -12,13 +12,12 @@ export type RegisterNodeBody = {
 export type GetNodeRegistryBody = {
   nodes: Node[];
 };
-var getNodeRegistryBody: GetNodeRegistryBody = { nodes: [] };
 
 export async function launchRegistry() {
   const _registry = express();
   _registry.use(express.json());
   _registry.use(bodyParser.json());
-
+  let getNodeRegistryBody: GetNodeRegistryBody = { nodes: [] };
   _registry.post("/registerNode", (req, res) => {
     const { nodeId, pubKey } = req.body;
     if (getNodeRegistryBody.nodes.some(n => n.nodeId === nodeId || n.pubKey === pubKey)) {
